@@ -1,0 +1,82 @@
+import axios from "axios"
+import {useUserStore} from "@/stores/user.js";
+
+const BASE_URL = 'http://127.0.0.1:8000'
+
+const api = axios.create({
+    baseURL: BASE_URL,
+    withCredentials: true,
+})
+
+api.interceptors.request.use(config => {
+    const user = useUserStore()
+    if (user.accessToken) {
+        config.headers.Authorization = `Bearer ${user.accessToken}`
+    }
+    return config
+})
+
+let isRefreshing = false
+let refreshSubscribers = []
+
+function subscribeTokenRefresh(callback) {
+    refreshSubscribers.push(callback)
+}
+
+function onRefreshed(token) {
+    refreshSubscribers.forEach(cb => cb(token))
+    refreshSubscribers = []
+}
+
+function onRefreshFailed(err) {
+    refreshSubscribers.forEach(cb => cb(null, err))
+    refreshSubscribers = []
+}
+
+api.interceptors.response.use(
+    response => response,
+    async error => {
+        const user = useUserStore()
+        const originalRequest = error?.config
+        if (!originalRequest) {
+            return Promise.reject(error)
+        }
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true
+
+            return new Promise((resolve, reject) => {
+                subscribeTokenRefresh((token, error) => {
+                    if (error) {
+                        reject(error)
+                    } else {
+                        originalRequest.headers.Authorization = `Bearer ${token}`
+                        resolve(api(originalRequest))
+                    }
+                })
+
+                if (!isRefreshing) {
+                    isRefreshing = true
+                    axios.post(
+                        `${BASE_URL}/api/user/account/refresh_token/`,
+                        {},
+                        {withCredentials: true, timeout: 5000}
+                    ).then(res => {
+                        user.setAccessToken(res.data.access)
+                        onRefreshed(res.data.access)
+                    }).catch(error => {
+                        user.logout()
+                        onRefreshFailed(error)
+                        reject(error)
+                    }).finally(() => {
+                        isRefreshing = false
+                    })
+                }
+            })
+        }
+
+        return Promise.reject(error)
+    }
+)
+
+export default api
