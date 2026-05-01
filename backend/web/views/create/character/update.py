@@ -39,7 +39,7 @@ class CharacterUpdateView(APIView):
             character.update_time = now()
             character.save()
             return Response({
-                'result':'success'
+                'result':'success',
             })
         except:
             return Response({
