@@ -1,10 +1,12 @@
 <script setup>
 
-import CreateCharater from "@/views/create/charater/CreateCharater.vue";
+import CreateCharacter from "@/views/create/character/CreateCharacter.vue";
+import UpdateCharacter from "@/views/create/character/UpdateCharacter.vue";
 </script>
 
 <template>
-  <CreateCharater/>
+  <CreateCharacter/>
+
 </template>
 
 <style scoped>

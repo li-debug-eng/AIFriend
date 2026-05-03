@@ -1,9 +1,9 @@
 <script setup>
 
-import Name from "@/views/create/charater/components/Name.vue";
-import Profile from "@/views/create/charater/components/Profile.vue";
-import BackgroundImage from "@/views/create/charater/components/BackgroundImage.vue";
-import Photo from "@/views/create/charater/components/Photo.vue";
+import Name from "@/views/create/character/components/Name.vue";
+import Profile from "@/views/create/character/components/Profile.vue";
+import BackgroundImage from "@/views/create/character/components/BackgroundImage.vue";
+import Photo from "@/views/create/character/components/Photo.vue";
 import {ref, useTemplateRef} from "vue";
 import {base64ToFile} from "@/js/utils/base64_to_file.js";
 import api from "@/js/http/api.js";
@@ -34,33 +34,32 @@ async function handleCreate(){
   }
   else if(!backgroundImage){
     errorMessage.value = '背景图片不能为空'
-  }
-  const formData = new FormData()
+  }else {
+    const formData = new FormData()
 
-  formData.append("name",name)
-  formData.append('profile',profile)
-  formData.append("background_image",base64ToFile(backgroundImage,'background_image.png'))
-  formData.append("photo",base64ToFile(photo,'photo.png'))
+    formData.append("name", name)
+    formData.append('profile', profile)
+    formData.append("background_image", base64ToFile(backgroundImage, 'background_image.png'))
+    formData.append("photo", base64ToFile(photo, 'photo.png'))
 
-  try{
-    const res = await api.post('/api/create/character/create/',formData )
-    const data = res.data
-    if(data.result==='success'){
-       errorMessage.value='success'
-       await router.push({
-         name:'user-space-index',
-         params:{
-           user_id:user.id
-         }
-       })
-    }else{
-      errorMessage.value =data.result
+    try {
+      const res = await api.post('/api/create/character/create/', formData)
+      const data = res.data
+      if (data.result === 'success') {
+        await router.push({
+          name: 'user-space-index',
+          params: {
+            user_id: user.id
+          }
+        })
+      } else {
+        errorMessage.value = data.result
+      }
+    } catch (err) {
+
     }
-  }catch(err){
-    console.log(err)
+
   }
-
-
 }
 </script>
 
@@ -70,7 +69,7 @@ async function handleCreate(){
       <div class="card-body">
         <h3 class="text-lg font-bold my-4">创建角色</h3>
         <Photo ref="photo-ref"/>
-        <name ref="name-ref"/>
+        <Name ref="name-ref"/>
         <Profile ref="profile-ref"/>
         <BackgroundImage ref="background-image-ref"/>
         <p v-if="errorMessage" class="text-red-500 text-sm">{{errorMessage}}</p>

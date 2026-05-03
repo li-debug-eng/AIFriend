@@ -8,6 +8,7 @@ import NotFoundIndex from "@/views/error/NotFoundIndex.vue";
 import LoginIndex from "@/views/user/account/LoginIndex.vue";
 import RegisterIndex from "@/views/user/account/RegisterIndex.vue";
 import {useUserStore} from "@/stores/user.js";
+import UpdateCharacter from "@/views/create/character/UpdateCharacter.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,14 @@ const router = createRouter({
       },
     },
 
+    {
+      path:'/create/character/update/:character_id/',
+      component:UpdateCharacter,
+      name:'update-character',
+      meta:{
+        needLogin:true,
+      },
+    },
     {
       path:'/friend/',
       component:FriendIndex,
