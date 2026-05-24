@@ -19,14 +19,15 @@ async function handleRegister() {
   else if(!password.value.trim()){
     errorMessage.value='密码不能为空'
   }
-  else if(!password.value.trim()===passwordConfirm.value.trim()) {
+  else if(password.value.trim() !== passwordConfirm.value.trim()) {
     errorMessage.value='两次密码不一致'
   }
   else{
     try{
-      const res = await api.post('/api/user/account/register/ ', {
+      const res = await api.post('/api/user/account/register/', {
         username: username.value,
         password: password.value,
+        password_confirm: passwordConfirm.value,
       })
       const data = res.data
       if (data.result === 'success') {

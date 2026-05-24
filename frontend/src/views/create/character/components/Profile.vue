@@ -5,7 +5,7 @@ import {ref, watch} from "vue";
 const props = defineProps(['profile'])
 const myProfile = ref(props.profile)
 
-watch(()=>myProfile,newVal=>{
+watch(()=>props.profile,newVal=>{
   myProfile.value=newVal
 })
 
