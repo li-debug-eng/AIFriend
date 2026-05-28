@@ -7,3 +7,6 @@ staticfiles/
 static/
 claude*/
 .claude/
+claude.md
+*.jpg
+docs/
