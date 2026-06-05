@@ -7,9 +7,25 @@ import SearchIcon from "@/components/navbar/icon/SearchIcon.vue";
 import CreateIcon from "@/components/navbar/icon/CreateIcon.vue";
 import {useUserStore} from "@/stores/user.js";
 import UserMenu from "@/components/navbar/UserMenu.vue";
+import {ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 
 
 const user = useUserStore()
+const searchQuery = ref('')
+const router = useRouter()
+const route = useRoute()
+watch(()=>route.query.q,newQ=>{
+  searchQuery.value = newQ || ''
+})
+function handleSearch() {
+  router.push({
+    name:'homepage-index',
+    query:{
+      q:searchQuery.value.trim(),
+    }
+  })
+}
 </script>
 
 <template>
@@ -25,14 +41,14 @@ const user = useUserStore()
         </label>
         <div class="px-2 font-bold text-xl">AI Friends</div>
       </div>
-      <div class="navbar-center w-4/5 max-w-180 flex justify-center">
+      <form @submit.prevent="handleSearch" class="navbar-center w-4/5 max-w-180 flex justify-center">
         <div class="join w-4/5 flex justify-center">
-          <input class="input join-item rounded-l-full w-4/5 " placeholder="搜索角色" />
+          <input v-model="searchQuery" class="input join-item rounded-l-full w-4/5 " placeholder="搜索角色" />
           <button class="btn join-item rounded-r-full ">
             <SearchIcon/>
           </button>
         </div>
-      </div>
+      </form>
       <div class="navbar-end">
         <RouterLink v-if="user.isLogin()" :to="{name:'create-index'}" active-class="btn-active" class="btn btn-ghost text-base mr-6">
           <CreateIcon/>
@@ -55,7 +71,7 @@ const user = useUserStore()
       <ul class="menu w-full grow">
         <!-- List item -->
         <li>
-          <RouterLink :to="{name:'homepage-index'}" active-class="menu-active" class="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="=首页">
+          <RouterLink :to="{name:'homepage-index'}" active-class="menu-active" class="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="首页">
             <!-- Home icon -->
           <HomepageIcon/>
             <span class="is-drawer-close:hidden text-base ml-2 whitespace-nowrap py-3">首页</span>
